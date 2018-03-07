@@ -64,7 +64,7 @@ static void LCD_WriteData_16Bit(uint16_t Data)
     //LCD_CS_1;
 }*/
 
-static void LCD_WriteData_NLen16Bit(uint16_t Data, uint32_t DataLen, int debug = -1)
+static void LCD_WriteData_NLen16Bit(uint16_t Data, uint32_t DataLen, int debug)
 {
     long cu = getMilli();
 
