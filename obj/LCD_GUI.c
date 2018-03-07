@@ -413,6 +413,6 @@ void GUI_Show(void)
 {
     LCD_Clear(GUI_BACKGROUND);
     long cu = getMilli();
-    printf("GUI clear duration %d\r\n", cu);
+    printf("GUI clear duration %ld\r\n", cu);
     GUI_DisNum(28, 55, 1234567890, &Font12, GUI_BACKGROUND, BLUE);
 }
