@@ -10,7 +10,7 @@
 #include "LCD_Driver.h"
 #include "DEV_Config.h"
 
-#include <stdlib.h>		//itoa()
+#include <stdlib.h> //itoa()
 #include <stdio.h>
 
 LCD_DIS sLCD_DIS;
@@ -64,15 +64,20 @@ static void LCD_WriteData_16Bit(uint16_t Data)
     //LCD_CS_1;
 }*/
 
-static void LCD_WriteData_NLen16Bit(uint16_t Data,uint32_t DataLen)
+static void LCD_WriteData_NLen16Bit(uint16_t Data, uint32_t DataLen)
 {
+    cu = getMilli();
+    
     uint32_t i;
     LCD_DC_1;
     //LCD_CS_0;
-    for(i = 0; i < DataLen; i++) {
-        SPI_Write_Byte( (uint8_t)(Data >> 8) );
-        SPI_Write_Byte( (uint8_t)(Data & 0XFF) );
+    for (i = 0; i < DataLen; i++)
+    {
+        SPI_Write_Byte((uint8_t)(Data >> 8));
+        SPI_Write_Byte((uint8_t)(Data & 0XFF));
     }
+    duration = cu - getMilli();
+    printf("LCD_WriteData_NLen16Bit duration %ld   DataLen = %d\r\n", duration, DataLen);
     //LCD_CS_1;
 }
 
@@ -171,9 +176,7 @@ static void LCD_InitReg(void)
 
     LCD_WriteReg(0x3A); //65k mode
     LCD_WriteData_8Bit(0x05);
-
 }
-
 
 /********************************************************************************
 function:	Set the display scan and color transfer modes
@@ -187,48 +190,55 @@ void LCD_SetGramScanWay(LCD_SCAN_DIR Scan_dir)
     sLCD_DIS.LCD_Scan_Dir = Scan_dir;
 
     //Get GRAM and LCD width and height
-    if(Scan_dir == L2R_U2D || Scan_dir == L2R_D2U || Scan_dir == R2L_U2D || Scan_dir == R2L_D2U) {
-        sLCD_DIS.LCD_Dis_Column	= LCD_HEIGHT ;
-        sLCD_DIS.LCD_Dis_Page = LCD_WIDTH ;
-    } else {
-        sLCD_DIS.LCD_Dis_Column	= LCD_WIDTH ;
-        sLCD_DIS.LCD_Dis_Page = LCD_HEIGHT ;
+    if (Scan_dir == L2R_U2D || Scan_dir == L2R_D2U || Scan_dir == R2L_U2D || Scan_dir == R2L_D2U)
+    {
+        sLCD_DIS.LCD_Dis_Column = LCD_HEIGHT;
+        sLCD_DIS.LCD_Dis_Page = LCD_WIDTH;
+    }
+    else
+    {
+        sLCD_DIS.LCD_Dis_Column = LCD_WIDTH;
+        sLCD_DIS.LCD_Dis_Page = LCD_HEIGHT;
     }
 
     // Gets the scan direction of GRAM
-    uint16_t MemoryAccessReg_Data=0;  //0x36
-    switch (Scan_dir) {
+    uint16_t MemoryAccessReg_Data = 0; //0x36
+    switch (Scan_dir)
+    {
     case L2R_U2D:
-        MemoryAccessReg_Data = 0X00 | 0x00;//x Scan direction | y Scan direction
+        MemoryAccessReg_Data = 0X00 | 0x00; //x Scan direction | y Scan direction
         break;
     case L2R_D2U:
-        MemoryAccessReg_Data = 0x00 | 0x80;//0xC8 | 0X10
+        MemoryAccessReg_Data = 0x00 | 0x80; //0xC8 | 0X10
         break;
-    case R2L_U2D://	0X4
+    case R2L_U2D: //	0X4
         MemoryAccessReg_Data = 0x40 | 0x00;
         break;
-    case R2L_D2U://	0XC
+    case R2L_D2U: //	0XC
         MemoryAccessReg_Data = 0x40 | 0x80;
         break;
-    case U2D_L2R://0X2
+    case U2D_L2R: //0X2
         MemoryAccessReg_Data = 0X00 | 0X00 | 0x20;
         break;
-    case U2D_R2L://0X6
+    case U2D_R2L: //0X6
         MemoryAccessReg_Data = 0x00 | 0X40 | 0x20;
         break;
-    case D2U_L2R://0XA
+    case D2U_L2R: //0XA
         MemoryAccessReg_Data = 0x80 | 0x00 | 0x20;
         break;
-    case D2U_R2L://0XE
+    case D2U_R2L: //0XE
         MemoryAccessReg_Data = 0x40 | 0x80 | 0x20;
         break;
     }
 
     //please set (MemoryAccessReg_Data & 0x10) != 1
-    if((MemoryAccessReg_Data && 0x20) != 1) {
+    if ((MemoryAccessReg_Data && 0x20) != 1)
+    {
         sLCD_DIS.LCD_X_Adjust = LCD_X;
         sLCD_DIS.LCD_Y_Adjust = LCD_Y;
-    } else {
+    }
+    else
+    {
         sLCD_DIS.LCD_X_Adjust = LCD_Y;
         sLCD_DIS.LCD_Y_Adjust = LCD_X;
     }
@@ -236,11 +246,10 @@ void LCD_SetGramScanWay(LCD_SCAN_DIR Scan_dir)
     // Set the read / write scan direction of the frame memory
     LCD_WriteReg(0x36); //MX, MY, RGB mode
 #if defined(LCD_1IN44)
-    LCD_WriteData_8Bit( MemoryAccessReg_Data | 0x08);	//0x08 set RGB
+    LCD_WriteData_8Bit(MemoryAccessReg_Data | 0x08); //0x08 set RGB
 #elif defined(LCD_1IN8)
-    LCD_WriteData_8Bit( MemoryAccessReg_Data & 0xf7);	//RGB color filter panel
+    LCD_WriteData_8Bit(MemoryAccessReg_Data & 0xf7); //RGB color filter panel
 #endif
-
 }
 
 /***********************************************************************************************************************
@@ -254,7 +263,7 @@ void LCD_SetGramScanWay(LCD_SCAN_DIR Scan_dir)
 function:
 			initialization
 ********************************************************************************/
-void LCD_Init( LCD_SCAN_DIR Lcd_ScanDir )
+void LCD_Init(LCD_SCAN_DIR Lcd_ScanDir)
 {
     //Turn on the backlight
     LCD_BL_1;
@@ -266,7 +275,7 @@ void LCD_Init( LCD_SCAN_DIR Lcd_ScanDir )
     LCD_InitReg();
 
     //Set the display scan and color transfer modes
-    LCD_SetGramScanWay( Lcd_ScanDir );
+    LCD_SetGramScanWay(Lcd_ScanDir);
     Driver_Delay_ms(200);
 
     //sleep out
@@ -285,25 +294,24 @@ parameter:
 		Xend    :   X direction end coordinates
 		Yend    :   Y direction end coordinates
 ********************************************************************************/
-void LCD_SetWindows( POINT Xstart, POINT Ystart, POINT Xend, POINT Yend )
+void LCD_SetWindows(POINT Xstart, POINT Ystart, POINT Xend, POINT Yend)
 {
 
     //set the X coordinates
-    LCD_WriteReg ( 0x2A );
-    LCD_WriteData_8Bit ( 0x00 );						//Set the horizontal starting point to the high octet
-    LCD_WriteData_8Bit ( (Xstart & 0xff) + sLCD_DIS.LCD_X_Adjust);			//Set the horizontal starting point to the low octet
-    LCD_WriteData_8Bit ( 0x00 );				//Set the horizontal end to the high octet
-    LCD_WriteData_8Bit ( (( Xend - 1 ) & 0xff) + sLCD_DIS.LCD_X_Adjust);	//Set the horizontal end to the low octet
+    LCD_WriteReg(0x2A);
+    LCD_WriteData_8Bit(0x00);                                        //Set the horizontal starting point to the high octet
+    LCD_WriteData_8Bit((Xstart & 0xff) + sLCD_DIS.LCD_X_Adjust);     //Set the horizontal starting point to the low octet
+    LCD_WriteData_8Bit(0x00);                                        //Set the horizontal end to the high octet
+    LCD_WriteData_8Bit(((Xend - 1) & 0xff) + sLCD_DIS.LCD_X_Adjust); //Set the horizontal end to the low octet
 
     //set the Y coordinates
-    LCD_WriteReg ( 0x2B );
-    LCD_WriteData_8Bit ( 0x00 );
-    LCD_WriteData_8Bit ( (Ystart & 0xff) + sLCD_DIS.LCD_Y_Adjust);
-    LCD_WriteData_8Bit ( 0x00 );
-    LCD_WriteData_8Bit ( ( (Yend - 1) & 0xff )+ sLCD_DIS.LCD_Y_Adjust);
+    LCD_WriteReg(0x2B);
+    LCD_WriteData_8Bit(0x00);
+    LCD_WriteData_8Bit((Ystart & 0xff) + sLCD_DIS.LCD_Y_Adjust);
+    LCD_WriteData_8Bit(0x00);
+    LCD_WriteData_8Bit(((Yend - 1) & 0xff) + sLCD_DIS.LCD_Y_Adjust);
 
     LCD_WriteReg(0x2C);
-
 }
 
 /********************************************************************************
@@ -312,9 +320,9 @@ parameter:
 		xStart :   X direction Start coordinates
 		xEnd   :   X direction end coordinates
 ********************************************************************************/
-void LCD_SetCursor ( POINT Xpoint, POINT Ypoint )
+void LCD_SetCursor(POINT Xpoint, POINT Ypoint)
 {
-    LCD_SetWindows ( Xpoint, Ypoint, Xpoint , Ypoint );
+    LCD_SetWindows(Xpoint, Ypoint, Xpoint, Ypoint);
 }
 
 /********************************************************************************
@@ -323,9 +331,9 @@ parameter:
 		Color  :   Set show color
 ********************************************************************************/
 //static void LCD_SetColor( LENGTH Dis_Width, LENGTH Dis_Height, COLOR Color ){
-void LCD_SetColor( COLOR Color ,POINT Xpoint, POINT Ypoint)
+void LCD_SetColor(COLOR Color, POINT Xpoint, POINT Ypoint)
 {
-    LCD_WriteData_NLen16Bit(Color ,(uint32_t)Xpoint * (uint32_t)Ypoint);
+    LCD_WriteData_NLen16Bit(Color, (uint32_t)Xpoint * (uint32_t)Ypoint);
 }
 
 /********************************************************************************
@@ -335,11 +343,12 @@ parameter:
 		Ypoint :   The y coordinate of the point
 		Color  :   Set the color
 ********************************************************************************/
-void LCD_SetPointlColor ( POINT Xpoint, POINT Ypoint, COLOR Color )
+void LCD_SetPointlColor(POINT Xpoint, POINT Ypoint, COLOR Color)
 {
-    if ( ( Xpoint <= sLCD_DIS.LCD_Dis_Column ) && ( Ypoint <= sLCD_DIS.LCD_Dis_Page ) ) {
-        LCD_SetCursor (Xpoint, Ypoint);
-        LCD_SetColor ( Color , 1 , 1);
+    if ((Xpoint <= sLCD_DIS.LCD_Dis_Column) && (Ypoint <= sLCD_DIS.LCD_Dis_Page))
+    {
+        LCD_SetCursor(Xpoint, Ypoint);
+        LCD_SetColor(Color, 1, 1);
     }
 }
 
@@ -352,16 +361,17 @@ parameter:
 		Yend   :   End point coordinates
 		Color  :   Set the color
 ********************************************************************************/
-void LCD_SetArealColor (POINT Xstart, POINT Ystart, POINT Xend, POINT Yend,	COLOR  Color)
+void LCD_SetArealColor(POINT Xstart, POINT Ystart, POINT Xend, POINT Yend, COLOR Color)
 {
-    if((Xend > Xstart) && (Yend > Ystart)) {
+    if ((Xend > Xstart) && (Yend > Ystart))
+    {
         long cu = getMilli();
-        LCD_SetWindows( Xstart , Ystart , Xend , Yend  );
+        LCD_SetWindows(Xstart, Ystart, Xend, Yend);
         long duration = cu - getMilli();
         printf("LCD_SetWindows duration %ld\r\n", duration);
 
         cu = getMilli();
-        LCD_SetColor ( Color ,Xend - Xstart , Yend - Ystart );
+        LCD_SetColor(Color, Xend - Xstart, Yend - Ystart);
         duration = cu - getMilli();
         printf("LCD_SetColor duration %ld\r\n", duration);
     }
@@ -372,10 +382,7 @@ function:
 			Clear screen
 ********************************************************************************/
 
-void LCD_Clear(COLOR  Color)
+void LCD_Clear(COLOR Color)
 {
-    LCD_SetArealColor(0,0, sLCD_DIS.LCD_Dis_Column , sLCD_DIS.LCD_Dis_Page, Color);
+    LCD_SetArealColor(0, 0, sLCD_DIS.LCD_Dis_Column, sLCD_DIS.LCD_Dis_Page, Color);
 }
-
-
-
