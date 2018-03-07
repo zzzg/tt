@@ -13,7 +13,7 @@ CC = gcc
 DEBUG = -g -O0 -Wall
 CFLAGS += $(DEBUG)
 
-LIB = -lwiringPi
+LIB = -lbcm2835
 
 ${TARGET}:${OBJ_O}
 	$(CC) $(CFLAGS) $(OBJ_O) -o $@ $(LIB)

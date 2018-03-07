@@ -1,14 +1,13 @@
-#include <wiringPi.h>
-#include <wiringPiSPI.h>
+#include <bcm2835.h>
 
 #include <stdio.h>		//printf()
 #include <stdlib.h>		//exit()
 #include <time.h>  
 
+#include "DEV_Config.h"
 #include "LCD_Driver.h"
 #include "LCD_GUI.h"
 #include "LCD_BMP.h"
-#include "DEV_Config.h"
 
 int main(void)
 {
@@ -26,10 +25,11 @@ int main(void)
 	Driver_Delay_ms(1000);
 	
 	printf("show bmp\r\n");
-	//LCD_ShowBmp("./pic/time.bmp");
+	LCD_ShowBmp("./pic/time.bmp");	
 	
 	//3.System Exit
 	System_Exit();
 	return 0;
 	
 }
+

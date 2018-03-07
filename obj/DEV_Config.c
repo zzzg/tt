@@ -1,69 +1,81 @@
 #include "DEV_Config.h"
+#include <bcm2835.h>
+#include <stdio.h>		//printf()
 
-#include <wiringPi.h>
-#include <wiringPiSPI.h>
 
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/time.h>
-long int getMilli()
+void GPIO_Config(void)
 {
-    struct timeval tp;
-    gettimeofday(&tp, NULL);
-    long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
-    return ms;
+	bcm2835_gpio_fsel(LCD_RST,       BCM2835_GPIO_FSEL_OUTP);
+    bcm2835_gpio_fsel(LCD_DC,        BCM2835_GPIO_FSEL_OUTP);
+    bcm2835_gpio_fsel(LCD_CS,        BCM2835_GPIO_FSEL_OUTP);
+	
+	bcm2835_gpio_fsel(KEY_UP_PIN,    BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_fsel(KEY_DOWN_PIN,  BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_fsel(KEY_LEFT_PIN,  BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_fsel(KEY_RIGHT_PIN, BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_fsel(KEY_PRESS_PIN, BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_fsel(KEY1_PIN,      BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_fsel(KEY2_PIN,      BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_fsel(KEY3_PIN,      BCM2835_GPIO_FSEL_INPT);
+	
+	bcm2835_gpio_set_pud(KEY_UP_PIN,    BCM2835_GPIO_PUD_UP);
+	bcm2835_gpio_set_pud(KEY_DOWN_PIN,  BCM2835_GPIO_PUD_UP);
+	bcm2835_gpio_set_pud(KEY_LEFT_PIN,  BCM2835_GPIO_PUD_UP);
+	bcm2835_gpio_set_pud(KEY_RIGHT_PIN, BCM2835_GPIO_PUD_UP);
+	bcm2835_gpio_set_pud(KEY_PRESS_PIN, BCM2835_GPIO_PUD_UP);
+	bcm2835_gpio_set_pud(KEY1_PIN,      BCM2835_GPIO_PUD_UP);
+	bcm2835_gpio_set_pud(KEY2_PIN,      BCM2835_GPIO_PUD_UP);
+	bcm2835_gpio_set_pud(KEY3_PIN,      BCM2835_GPIO_PUD_UP);
 }
+
+
 uint8_t System_Init(void)
 {
-	//1.wiringPiSetupGpio
-    //if(wiringPiSetup() < 0)//use wiringpi Pin number table
-    if(wiringPiSetupGpio() < 0) { //use BCM2835 Pin number table
-        printf(" set wiringPi lib failed	!!! \r\n");
+    if(!bcm2835_init()) {
+        printf("bcm2835 init failed   !!! \r\n");
         return 1;
     } else {
-        printf(" set wiringPi lib success  !!! \r\n");
+        printf("bcm2835 init success  !!! \r\n");
     }
-    //2.GPIO config
-    pinMode(LCD_RST,OUTPUT);
-    pinMode(LCD_DC,OUTPUT);
-    pinMode(LCD_BL,OUTPUT);
-    pinMode(LCD_CS,OUTPUT);	//must set cs output,Otherwise it does not work
+	
+	GPIO_Config();
 
-    //3.spi init
-    //wiringPiSPISetup(0,9000000);
-    wiringPiSPISetupMode(0, 32000000, 0);
+	printf("USE_SPI\r\n");
+    bcm2835_spi_begin(); 										 //Start spi interface, set spi pin for the reuse function
+    bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);     //High first transmission
+    bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);                  //spi mode 1
+    bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_16);   //Frequency
+    bcm2835_spi_chipSelect(BCM2835_SPI_CS0);                     //set CE0
+    bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);     //enable cs0
+
     return 0;
 }
 
 void System_Exit(void)
 {
-	LCD_CS_1;
+    bcm2835_spi_end();
+    bcm2835_close();
+}
+/*********************************************
+
+
+*********************************************/	
+ void SPI_Write_Byte(uint8_t value)                                    
+{    
+	bcm2835_spi_transfer(value);
 }
 
 /*********************************************
 
 
-*********************************************/
-void SPI_Write_Byte(uint8_t value)
-{
-    int read_data;
-    read_data = wiringPiSPIDataRW(0,&value,1);
-    if(read_data < 0)
-        perror("wiringPiSPIDataRW failed\r\n");
-}
-
-/*********************************************
-
-
-*********************************************/
-void Driver_Delay_ms(uint32_t xms)
-{
-    delay(xms);
+*********************************************/	
+void Driver_Delay_ms(uint32_t xms)	
+{	
+	bcm2835_delay(xms);
 }
 
 void Driver_Delay_us(uint32_t xus)
 {
-    int j;
-    for(j=xus; j > 0; j--);
+  int j;
+  for(j=xus;j > 0;j--);    
 }

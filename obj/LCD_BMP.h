@@ -8,7 +8,7 @@
 
 #define  RGB(r,g,b)         (((r>>3)<<11)|((g>>2)<<5)|(b>>3))
 
-typedef unsigned char BYTE;//2 byte
+typedef unsigned char BYTE;//1 byte
 typedef unsigned short WORD;//2 byte
 typedef unsigned long DWORD;//4 byte
 /****************************** Bitmap standard information*************************************/
