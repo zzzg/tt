@@ -76,7 +76,7 @@ static void LCD_WriteData_NLen16Bit(uint16_t Data, uint32_t DataLen)
         SPI_Write_Byte((uint8_t)(Data >> 8));
         SPI_Write_Byte((uint8_t)(Data & 0XFF));
     }
-    duration = cu - getMilli();
+    long duration = cu - getMilli();
     printf("LCD_WriteData_NLen16Bit duration %ld   DataLen = %d\r\n", duration, DataLen);
     //LCD_CS_1;
 }
