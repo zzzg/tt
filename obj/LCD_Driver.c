@@ -14,7 +14,14 @@
 #include <stdio.h>
 
 LCD_DIS sLCD_DIS;
-
+#include <sys/time.h>
+long int getMilli()
+{
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+    return ms;
+}
 /***********************************************************************************************************************
 			------------------------------------------------------------------------
 			|\\\																///|
@@ -355,8 +362,15 @@ parameter:
 void LCD_SetArealColor (POINT Xstart, POINT Ystart, POINT Xend, POINT Yend,	COLOR  Color)
 {
     if((Xend > Xstart) && (Yend > Ystart)) {
+        long cu = getMilli();
         LCD_SetWindows( Xstart , Ystart , Xend , Yend  );
+        long duration = cu - getMilli();
+        printf("LCD_SetWindows duration %ld\r\n", duration);
+
+        cu = getMilli();
         LCD_SetColor ( Color ,Xend - Xstart , Yend - Ystart );
+        long duration = cu - getMilli();
+        printf("LCD_SetColor duration %ld\r\n", duration);
     }
 }
 
@@ -364,6 +378,7 @@ void LCD_SetArealColor (POINT Xstart, POINT Ystart, POINT Xend, POINT Yend,	COLO
 function:
 			Clear screen
 ********************************************************************************/
+
 void LCD_Clear(COLOR  Color)
 {
     LCD_SetArealColor(0,0, sLCD_DIS.LCD_Dis_Column , sLCD_DIS.LCD_Dis_Page, Color);
