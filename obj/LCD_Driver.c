@@ -334,7 +334,7 @@ parameter:
 //static void LCD_SetColor( LENGTH Dis_Width, LENGTH Dis_Height, COLOR Color ){
 void LCD_SetColor(COLOR Color, POINT Xpoint, POINT Ypoint)
 {
-    //LCD_WriteData_NLen16Bit(Color, (uint32_t)Xpoint * (uint32_t)Ypoint, 1);
+    LCD_WriteData_NLen16Bit(Color, (uint32_t)Xpoint * (uint32_t)Ypoint, 1);
 }
 
 /********************************************************************************

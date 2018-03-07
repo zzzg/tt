@@ -408,7 +408,9 @@ void GUI_Show(void)
     LCD_Clear(GUI_BACKGROUND);
     long duration = cu - getMilli();
     printf("GUI clear duration %ld\r\n", duration);
-    // GUI_DisNum(28, 55, 1234567890, &Font12, GUI_BACKGROUND, BLUE);
-    LCD_Clear(GUI_BACKGROUND);
+    GUI_DisNum(28, 55, 1234567890, &Font12, GUI_BACKGROUND, BLUE);
+    Driver_Delay_ms(1000);
+    // LCD_Clear(GUI_BACKGROUND);
+    GUI_DisNum(28, 55, 1234567890, &Font12, GUI_BACKGROUND, GUI_BACKGROUND);
     GUI_DisNum(28, 15, 4567890, &Font12, GUI_BACKGROUND, BLUE);
 }
