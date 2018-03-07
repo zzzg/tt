@@ -64,10 +64,10 @@ static void LCD_WriteData_16Bit(uint16_t Data)
     //LCD_CS_1;
 }*/
 
-static void LCD_WriteData_NLen16Bit(uint16_t Data, uint32_t DataLen)
+static void LCD_WriteData_NLen16Bit(uint16_t Data, uint32_t DataLen, int debug = -1)
 {
     long cu = getMilli();
-    
+
     uint32_t i;
     LCD_DC_1;
     //LCD_CS_0;
@@ -77,7 +77,8 @@ static void LCD_WriteData_NLen16Bit(uint16_t Data, uint32_t DataLen)
         SPI_Write_Byte((uint8_t)(Data & 0XFF));
     }
     long duration = cu - getMilli();
-    printf("LCD_WriteData_NLen16Bit duration %ld   DataLen = %d\r\n", duration, DataLen);
+    if (debug == 1)
+        printf("LCD_WriteData_NLen16Bit duration %ld   DataLen = %d\r\n", duration, DataLen);
     //LCD_CS_1;
 }
 
@@ -333,7 +334,7 @@ parameter:
 //static void LCD_SetColor( LENGTH Dis_Width, LENGTH Dis_Height, COLOR Color ){
 void LCD_SetColor(COLOR Color, POINT Xpoint, POINT Ypoint)
 {
-    LCD_WriteData_NLen16Bit(Color, (uint32_t)Xpoint * (uint32_t)Ypoint);
+    LCD_WriteData_NLen16Bit(Color, (uint32_t)Xpoint * (uint32_t)Ypoint, 1);
 }
 
 /********************************************************************************
