@@ -397,14 +397,7 @@ void GUI_Disbitmap(POINT Xpoint, POINT Ypoint, const unsigned char *pBmp,
     }
 }
 
-#include <sys/time.h>
-long int getMilli()
-{
-    struct timeval tp;
-    gettimeofday(&tp, NULL);
-    long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
-    return ms;
-}
+
 /********************************************************************************
 function:	LCD_Show
 parameter:

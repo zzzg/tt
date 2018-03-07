@@ -6,7 +6,14 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <sys/time.h>
+long int getMilli()
+{
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+    return ms;
+}
 uint8_t System_Init(void)
 {
 	//1.wiringPiSetupGpio
