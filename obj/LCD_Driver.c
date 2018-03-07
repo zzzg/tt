@@ -369,7 +369,7 @@ void LCD_SetArealColor (POINT Xstart, POINT Ystart, POINT Xend, POINT Yend,	COLO
 
         cu = getMilli();
         LCD_SetColor ( Color ,Xend - Xstart , Yend - Ystart );
-        long duration = cu - getMilli();
+        duration = cu - getMilli();
         printf("LCD_SetColor duration %ld\r\n", duration);
     }
 }
